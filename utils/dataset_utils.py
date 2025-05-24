@@ -23,7 +23,7 @@ class PromptTrainDataset(Dataset):
         self.de_type = self.args.de_type
         print(self.de_type)
 
-        self.de_dict = {'denoise_15': 0, 'denoise_25': 1, 'denoise_50': 2, 'derain': 3, 'dehaze': 4, 'deblur' : 5}
+        self.de_dict = {'denoise_15': 0, 'denoise_25': 1, 'denoise_50': 2, 'derain': 3, 'dehaze': 4, 'deblur' : 5, "rain": 6, "snow": 7}
 
         self._init_ids()
         self._merge_ids()
@@ -42,6 +42,10 @@ class PromptTrainDataset(Dataset):
             self._init_rs_ids()
         if 'dehaze' in self.de_type:
             self._init_hazy_ids()
+        #if 'rain' in self.de_type:
+            #self._init_rain_ids()
+        #if 'snow' in self.de_type:
+            #self._init_snow_ids()
 
         random.shuffle(self.de_type)
 
