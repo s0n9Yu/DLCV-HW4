@@ -36,7 +36,8 @@ class PromptIRModel(pl.LightningModule):
         ([clean_name, de_id], degrad_patch, clean_patch) = batch
         restored = self.net(degrad_patch)
 
-        loss = (self.loss_fn(restored,clean_patch) + self.l2loss(restored, clean_patch)) / 2
+        #loss = (self.loss_fn(restored,clean_patch) + self.l2loss(restored, clean_patch)) / 2
+        loss = self.loss_fn(restored,clean_patch)
         # Logging to TensorBoard (if installed) by default
         self.log("train_loss", loss)
         return loss
@@ -59,7 +60,7 @@ class PromptIRModel(pl.LightningModule):
         lr = scheduler.get_lr()
     
     def configure_optimizers(self):
-        optimizer = optim.Adam(self.parameters(), lr=1e-4)
+        optimizer = optim.Adam(self.parameters(), lr=2e-4)
         #scheduler = LinearWarmupCosineAnnealingLR(optimizer=optimizer,warmup_epochs=15,max_epochs=500, eta_min=1e-6)
         scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=500)
 
@@ -74,14 +75,14 @@ def main():
     print("Options")
     print(opt)
     if opt.wblogger is not None:
-        logger  = WandbLogger(project=opt.wblogger,name="PromptIR-Train")
+        logger  = WandbLogger(project=opt.wblogger,name=f"PromptIR-Train-{opt.expname}")
     else:
         logger = TensorBoardLogger(save_dir = "logs/")
 
     #trainset = PromptTrainDataset(opt)
     trainset = OursDataset(path="data_ours/train", patchsize=128)
     validset = OursDataset(path="data_ours/valid", patchsize=128)
-    checkpoint_callback = ModelCheckpoint(dirpath = opt.ckpt_dir,every_n_epochs = 1,save_top_k=-1)
+    checkpoint_callback = ModelCheckpoint(dirpath = opt.ckpt_dir,every_n_epochs = 1,save_top_k=-1, filename='{epoch}-'+f'{opt.expname}')
     trainloader = DataLoader(trainset, batch_size=opt.batch_size, pin_memory=True, shuffle=True,
                              drop_last=True, num_workers=opt.num_workers)
     validloader = DataLoader(validset, batch_size=opt.batch_size, pin_memory=True, shuffle=False,

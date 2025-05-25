@@ -30,5 +30,8 @@ parser.add_argument("--wblogger",type=str,default="promptir",help = "Determine t
 parser.add_argument("--ckpt_dir",type=str,default="train_ckpt",help = "Name of the Directory where the checkpoint is to be saved")
 parser.add_argument("--num_gpus",type=int,default= 4,help = "Number of GPUs to use for training")
 
+
+parser.add_argument("--expname",type=str)
+
 options = parser.parse_args()
 
